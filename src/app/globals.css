@@ -8,18 +8,23 @@
   --font-mono: var(--font-mono);
 }
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
+    --background: #ffffff;
+    --foreground: #171717;
+    --primary: #8b5cf6;
+    /* Violet 500 */
+    --primary-foreground: #ffffff;
+
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
+  }
+
+  .dark {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --primary: #a78bfa;
+    /* Violet 400 */
   }
 }
 
@@ -29,4 +34,79 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+
+  /* MDX Content Styling */
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4 {
+    color: var(--foreground);
+    position: relative;
+    scroll-margin-top: 100px;
+    /* Header offset */
+  }
+
+  /* Add accent color to headings */
+  .prose h2 {
+    color: var(--primary);
+    /* border-bottom: 2px solid var(--primary); */
+    /* padding-bottom: 0.3em; */
+    margin-top: 2em;
+    display: inline-block;
+    padding-right: 1rem;
+  }
+
+  .prose h3 {
+    color: var(--primary);
+    opacity: 0.9;
+  }
+
+  .prose a {
+    color: var(--primary);
+    text-decoration: none;
+    /* border-bottom: 1px dashed var(--primary); */
+    transition: all 0.2s ease;
+  }
+
+  .prose a:hover {
+    background-color: color-mix(in srgb, var(--primary), transparent 90%);
+    /* border-bottom-style: solid; */
+  }
+
+  .prose blockquote {
+    border-left-color: var(--primary);
+    background-color: color-mix(in srgb, var(--primary), transparent 95%);
+    font-style: normal;
+    padding: 1rem;
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+
+  .prose blockquote p:first-of-type::before {
+    content: none;
+  }
+
+  .prose blockquote p:last-of-type::after {
+    content: none;
+  }
+
+  .prose code {
+    color: var(--primary);
+    background-color: color-mix(in srgb, var(--primary), transparent 90%);
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-weight: 500;
+  }
+
+  .prose code::before,
+  .prose code::after {
+    content: none;
+  }
+
+  .prose pre {
+    border: 1px solid var(--foreground);
+    border-opacity: 0.1;
+  }
 }

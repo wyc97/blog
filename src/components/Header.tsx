@@ -10,7 +10,6 @@ import { ThemeToggle } from "./ThemeToggle";
 const navigation = [
     { name: "Blog", href: "/blog" },
     { name: "Projects", href: "/projects" },
-    { name: "About", href: "/about" },
 ];
 
 export function Header() {

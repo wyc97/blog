@@ -30,6 +30,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
 }
 
+import Slugger from "github-slugger";
+import { TableOfContents } from "@/components/TableOfContents";
+
 export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
     const post = getPostBySlug(slug);
@@ -40,90 +43,90 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
     const { title, date, readingTime, tags, content } = post;
 
+    // Extract headings from markdown content
+    const slugger = new Slugger();
+    const headings = content
+        .split("\n")
+        .filter((line) => line.match(/^#{2,3}\s/))
+        .map((line) => {
+            const level = line.match(/^#{2,3}/)?.[0].length || 2;
+            const text = line.replace(/^#{2,3}\s/, "");
+            const id = slugger.slug(text);
+            return { id, text, level };
+        });
+
     return (
-        <article>
-            <div className="xl:divide-y xl:divide-zinc-200 xl:dark:divide-zinc-700">
-                <header className="pt-6 xl:pb-6">
-                    <div className="space-y-1 text-center">
-                        <dl className="space-y-10">
-                            <div>
-                                <dt className="sr-only">Published on</dt>
-                                <dd className="text-base font-medium leading-6 text-zinc-500 dark:text-zinc-400">
-                                    <time dateTime={date}>{formatDate(date)}</time>
-                                </dd>
-                            </div>
+        <article className="xl:grid xl:grid-cols-4 xl:items-start xl:gap-x-10 pt-10">
+            {/* Left Sidebar (Meta Info) */}
+            <div className="pb-8 xl:sticky xl:top-24 xl:col-span-1 xl:pb-0">
+                <div className="space-y-8">
+                    <div>
+                        <Link
+                            href="/blog"
+                            className="text-sm font-medium text-[var(--primary)] hover:opacity-80 mb-8 block"
+                        >
+                            &larr; Back to blog
+                        </Link>
+
+                        <dl>
+                            <dt className="sr-only">Published on</dt>
+                            <dd className="text-sm font-medium leading-6 text-zinc-500 dark:text-zinc-400">
+                                <time dateTime={date}>{formatDate(date)}</time>
+                            </dd>
                         </dl>
-                        <div>
-                            <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl sm:leading-10 md:text-5xl md:leading-14">
-                                {title}
-                            </h1>
+
+                        <h1 className="mt-2 text-3xl font-bold leading-9 tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl sm:leading-10 md:leading-14">
+                            {title}
+                        </h1>
+
+                        <div className="mt-4 flex flex-wrap gap-2">
+                            {tags && tags.map((tag) => (
+                                <span
+                                    key={tag}
+                                    className="text-xs font-medium uppercase text-[var(--primary)] opacity-80"
+                                >
+                                    #{tag}
+                                </span>
+                            ))}
                         </div>
                     </div>
-                </header>
-                <div className="divide-y divide-zinc-200 pb-8 dark:divide-zinc-700 xl:grid xl:grid-cols-4 xl:gap-x-6 xl:divide-y-0">
-                    <dl className="pb-10 pt-6 xl:border-b xl:border-zinc-200 xl:pt-11 xl:dark:border-zinc-700">
-                        <dt className="sr-only">Authors</dt>
-                        <dd>
-                            <ul className="flex justify-center flex-wrap gap-4 sm:space-x-12 xl:block xl:space-x-0 xl:space-y-8">
-                                <li className="flex items-center space-x-2">
-                                    <div className="font-medium dark:text-white">
-                                        <div>Eachen Author</div>
-                                        <div className="text-sm text-zinc-500">@{process.env.TWITTER_USER || "twitter_user"}</div>
-                                        <div className="text-sm text-zinc-500 dark:text-zinc-400 mt-2">{readingTime}</div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </dd>
-                    </dl>
-                    <div className="divide-y divide-zinc-200 dark:divide-zinc-700 xl:col-span-3 xl:row-span-2 xl:pb-0">
-                        <div className="prose max-w-none pb-8 pt-10 dark:prose-invert">
-                            <MDXRemote
-                                source={content}
-                                options={{
-                                    mdxOptions: {
-                                        remarkPlugins: [remarkGfm],
-                                        rehypePlugins: [
-                                            rehypeHighlight,
-                                            rehypeSlug,
-                                            [rehypeAutolinkHeadings, { behavior: "wrap" }],
-                                        ],
-                                    },
-                                }}
-                            />
-                        </div>
+
+                    <div className="hidden xl:block border-t border-zinc-200 dark:border-zinc-700 pt-8">
+                        <TableOfContents headings={headings} />
                     </div>
-                    <footer>
-                        <div className="divide-zinc-200 text-sm font-medium leading-5 dark:divide-zinc-700 xl:col-start-1 xl:row-start-2 xl:divide-y">
-                            {tags && (
-                                <div className="py-4 xl:py-8">
-                                    <h2 className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                                        Tags
-                                    </h2>
-                                    <div className="flex flex-wrap">
-                                        {tags.map((tag) => (
-                                            <Link
-                                                key={tag}
-                                                href={`/tags/${tag}`} // Planned
-                                                className="mr-3 text-blue-500 hover:text-blue-600 dark:hover:text-blue-400"
-                                            >
-                                                {tag}
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                            {(
-                                <div className="flex justify-between py-4 xl:block xl:space-y-8 xl:py-8">
-                                    <Link
-                                        href="/blog"
-                                        className="text-blue-500 hover:text-blue-600 dark:hover:text-blue-400"
-                                    >
-                                        &larr; Back to the blog
-                                    </Link>
-                                </div>
-                            )}
-                        </div>
-                    </footer>
+                </div>
+            </div>
+
+            {/* Right Content */}
+            <div className="xl:col-span-3">
+                <div className="prose max-w-none dark:prose-invert">
+                    <MDXRemote
+                        source={content}
+                        options={{
+                            mdxOptions: {
+                                remarkPlugins: [remarkGfm],
+                                rehypePlugins: [
+                                    rehypeHighlight,
+                                    rehypeSlug,
+                                    [rehypeAutolinkHeadings, { behavior: "wrap" }],
+                                ],
+                            },
+                        }}
+                    />
+                </div>
+
+                {/* Mobile Back Link (Visible only on small screens) */}
+                <div className="mt-8 xl:hidden border-t border-zinc-200 dark:border-zinc-700 pt-8">
+                    <TableOfContents headings={headings} />
+                </div>
+
+                <div className="mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-700">
+                    <Link
+                        href="/blog"
+                        className="text-[var(--primary)] hover:opacity-80"
+                    >
+                        &larr; Back to the blog
+                    </Link>
                 </div>
             </div>
         </article>
