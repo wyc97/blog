@@ -32,6 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 import Slugger from "github-slugger";
 import { TableOfContents } from "@/components/TableOfContents";
+import Comments from "@/components/Comments";
 
 export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
@@ -116,10 +117,6 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 </div>
 
                 {/* Mobile Back Link (Visible only on small screens) */}
-                <div className="mt-8 xl:hidden border-t border-zinc-200 dark:border-zinc-700 pt-8">
-                    <TableOfContents headings={headings} />
-                </div>
-
                 <div className="mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-700">
                     <Link
                         href="/blog"
@@ -128,6 +125,8 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                         &larr; Back to the blog
                     </Link>
                 </div>
+
+                <Comments />
             </div>
         </article>
     );
