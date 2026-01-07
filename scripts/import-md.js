@@ -20,6 +20,7 @@ function ensureDir(dir) {
   }
 }
 
+
 ensureDir(targetPostsDir);
 ensureDir(targetImagesBaseDir);
 
